@@ -1,0 +1,11 @@
+{
+    "name": "matej.sajgal/zet",
+    "description": "Zet PHP Framework experiment",
+    "authors": [
+        {
+            "name": "matej.sajgal",
+            "email": "matej@sajgal.com"
+        }
+    ],
+    "require": {}
+}
