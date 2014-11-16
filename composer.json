@@ -12,7 +12,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Zet\\": "src/Zet/"
+            "Zet\\": "src/Zet/",
+            "App\\": "public/"
         }
     }
 }

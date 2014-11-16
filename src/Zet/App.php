@@ -4,6 +4,8 @@
 namespace Zet;
 
 
+use Zet\Router\Router;
+
 class App
 {
     public function start(Router $router, $configurator)

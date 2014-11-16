@@ -48,6 +48,6 @@ class Request
     public function getRequestedRoute()
     {
         $pathWithoutIndex = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']) . '/';
-        return rtrim(str_replace($pathWithoutIndex, '', $this->getRequestedPath()), '/');
+        return '/' . rtrim(str_replace($pathWithoutIndex, '', $this->getRequestedPath()), '/');
     }
 }
