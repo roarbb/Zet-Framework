@@ -33,11 +33,11 @@ class BasicRouter implements Router
                 continue;
             }
 
-            if ($this->routeMatched($endpoint[self::ENDPOINT_MAP_LABEL], $requestedRoute)) {
+            if ($this->routeMatched($endpoint[self::ENDPOINT_MAP_LABEL], $requestedRoute, $request)) {
                 $this->checkCalledControllerMethod($fullControllerName, $controllerMethod);
 
-                $controller = new $fullControllerName;
-                $this->injectDependecies($controller, $fullControllerName);
+                $controller = new $fullControllerName($configurator);
+                $this->injectDependecies($controller, $fullControllerName, $request);
 
                 $controller->$controllerMethod();
                 exit;
@@ -85,7 +85,7 @@ class BasicRouter implements Router
         call_user_func(array($controllerNamespace . $errorController, 'notFound'));
     }
 
-    private function injectDependecies($controller, $fullControllerName)
+    private function injectDependecies($controller, $fullControllerName, Request $request)
     {
         if (!method_exists($fullControllerName, 'inject')) {
             return;
@@ -97,15 +97,39 @@ class BasicRouter implements Router
         $classesToInject = array();
         foreach ($injectParams AS $param) {
             $name = '\\' . $param->getClass()->name;
+
+            if($param->getClass()->name === $request->name()) {
+                $classesToInject[] = $request;
+                continue;
+            }
+
             $classesToInject[] = new $name();
         }
 
         $injectMethod->invokeArgs($controller, $classesToInject);
     }
 
-    private function routeMatched($map, $requestedRoute)
+    private function routeMatched($map, $requestedRoute, Request $request)
     {
-        return $map == $requestedRoute;
+        $routeSeparator = '/';
+        $dividedMap = explode($routeSeparator, $map);
+        $dividedRequestedRoute = explode($routeSeparator, $requestedRoute);
+
+        if(count($dividedMap) !== count($dividedRequestedRoute)) {
+            return false;
+        }
+
+        foreach ($dividedMap as $key => $mapFragment) {
+            if(substr($mapFragment, 0, 1) === '@') {
+                $request->setParameter(str_replace('@', '', $mapFragment), $dividedRequestedRoute[$key]);
+            } else {
+                if($mapFragment !== $dividedRequestedRoute[$key]) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     private function checkCalledControllerMethod($fullControllerName, $controllerMethod)

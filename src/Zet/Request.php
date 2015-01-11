@@ -6,6 +6,8 @@ namespace Zet;
 
 class Request
 {
+    private $parameters = array();
+
     public function getRequestInfo()
     {
         $out = array();
@@ -49,5 +51,27 @@ class Request
     {
         $pathWithoutIndex = str_replace('/index.php', '', $_SERVER['SCRIPT_NAME']) . '/';
         return '/' . rtrim(str_replace($pathWithoutIndex, '', $this->getRequestedPath()), '/');
+    }
+
+    /**
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    /**
+     * @param $key
+     * @param $parameter
+     */
+    public function setParameter($key, $parameter)
+    {
+        $this->parameters[$key] = $parameter;
+    }
+
+    public function name()
+    {
+        return get_class($this);
     }
 }
